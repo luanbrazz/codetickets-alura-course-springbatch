@@ -8,13 +8,18 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.time.LocalDateTime;
 
 @Configuration
 public class ImportacaoJobConfiguration {
@@ -49,6 +54,18 @@ public class ImportacaoJobConfiguration {
                 .delimited()
                 .names("cpf", "cliente", "nascimento", "evento", "data", "tipoIngresso", "valor")
                 .targetType(Importacao.class)
+                .build();
+    }
+
+    @Bean
+    public ItemWriter<Importacao> writer(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<Importacao>()
+                .dataSource(dataSource)
+                .sql(
+                        "INSERT INTO importacao (cliente, cpf, data, evento, hora_importacao, nascimento, tipo_ingresso, valor)\n" +
+                                "VALUES(:cliente, :cpf, :data, :evento, " + LocalDateTime.now() + ", :nascimento, :tipo_ingresso, :valor);"
+                )
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
     }
 }
