@@ -52,7 +52,7 @@ public class ImportacaoJobConfiguration {
 //        para csv(FlatFileItemReaderBuilder)
         return new FlatFileItemReaderBuilder<Importacao>()
                 .name("leitura-csv")
-                .resource(new FileSystemResource("files/dados.csv"))
+                .resource(new FileSystemResource("files/dados1.csv"))
                 .comments("--")
                 .delimited()
                 .delimiter(";")
