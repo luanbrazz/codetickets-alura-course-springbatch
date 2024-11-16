@@ -54,7 +54,7 @@ public class ImportacaoJobConfiguration {
                 .delimited()
                 .delimiter(";")
                 .names("cpf", "cliente", "nascimento", "evento", "data", "tipoIngresso", "valor")
-                .targetType(Importacao.class)
+                .fieldSetMapper(new ImportacaoMapper())
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class ImportacaoJobConfiguration {
                 .dataSource(dataSource)
                 .sql(
                         "INSERT INTO importacao (cliente, cpf, data, evento, hora_importacao, nascimento, tipo_ingresso, valor)\n" +
-                                "VALUES(:cliente, :cpf, :data, :evento, " + LocalDateTime.now() + ", :nascimento, :tipo_ingresso, :valor);"
+                                "VALUES(:cliente, :cpf, :data, :evento, :horaImportacao, :nascimento, :tipoIngresso, :valor);"
                 )
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
