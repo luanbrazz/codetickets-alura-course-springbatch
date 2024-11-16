@@ -40,6 +40,7 @@ public class ImportacaoJobConfiguration {
         return new StepBuilder("passo-inicial", jobRepository)
                 .<Importacao, Importacao>chunk(200, transactionManager)
                 .reader(reader)
+                .processor(processor())
                 .writer(writer)
                 .build();
     }
@@ -63,10 +64,15 @@ public class ImportacaoJobConfiguration {
         return new JdbcBatchItemWriterBuilder<Importacao>()
                 .dataSource(dataSource)
                 .sql(
-                        "INSERT INTO importacao (cliente, cpf, data, evento, hora_importacao, nascimento, tipo_ingresso, valor)\n" +
-                                "VALUES(:cliente, :cpf, :data, :evento, :horaImportacao, :nascimento, :tipoIngresso, :valor);"
+                        "INSERT INTO importacao (cliente, cpf, data, evento, hora_importacao, nascimento, tipo_ingresso, valor, taxa_adm)\n" +
+                                "VALUES(:cliente, :cpf, :data, :evento, :horaImportacao, :nascimento, :tipoIngresso, :valor, :taxaAdm);"
                 )
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
+    }
+
+    @Bean
+    public ImportacaoProcessor processor(){
+        return new ImportacaoProcessor();
     }
 }
